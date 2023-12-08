@@ -199,7 +199,7 @@ func ParseHandfull(pInput string) (Handfull, error) {
    return handfull, nil
 }
 
-func main() {
+func Part1() {
    fmt.Println("Part 1")
 
    games := ParseGames("./part1Input.txt")
@@ -215,4 +215,24 @@ func main() {
    }
 
    fmt.Println("Possible Game Ids Sum:", possibleGameIdsSum)
+}
+
+func Part2() {
+   fmt.Println("Part 2")
+
+   games := ParseGames("./part1Input.txt")
+
+   sumOfPowers := 0
+
+   for i := 0 ; i < len(games) ; i++ {
+      game := games[i]
+      sumOfPowers += (game.GetMaxRedCubes() * game.GetMaxGreenCubes() * game.GetMaxBlueCubes())
+   }
+
+   fmt.Println("Sum of Powers:", sumOfPowers)
+}
+
+func main() {
+   Part1()
+   Part2()
 }
