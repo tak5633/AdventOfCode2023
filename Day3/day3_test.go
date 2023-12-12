@@ -273,3 +273,78 @@ func Test_Example(t *testing.T) {
       t.Fatal()
    }
 }
+
+func Test_MapToSlices(t *testing.T) {
+
+   testMap := map[string][]int{}
+
+   if len(testMap) != 0 {
+      t.Fatal()
+   }
+
+   testMap["1,2"] = append(testMap["1,2"], 1)
+
+   if len(testMap) != 1 {
+      t.Fatal()
+   }
+
+   testMap["2,1"] = append(testMap["2,1"], 2)
+
+   if len(testMap) != 2 {
+      t.Fatal()
+   }
+
+   testMap["1,2"] = append(testMap["1,2"], 3)
+
+   if testMap["1,2"][0] != 1 && testMap["1,2"][1] != 3 {
+      t.Fatal()
+   }
+
+   testMap["2,1"] = append(testMap["2,1"], 4)
+
+   if testMap["2,1"][0] != 2 && testMap["2,1"][1] != 4 {
+      t.Fatal()
+   }
+}
+
+func Test_FindAllPotentialGears(t *testing.T) {
+   lines := []string{
+      "467..114..",
+      "...*......",
+      "..35..633.",
+      "......#...",
+      "617*......",
+      ".....+.58.",
+      "..592.....",
+      "......755.",
+      "...$.*....",
+      ".664.598..",
+   }
+
+   potentialGears := FindAllPotentialGears(lines)
+
+   if len(potentialGears) != 3 {
+      t.Fatal()
+   }
+}
+
+func Test_SumOfGearRatios(t *testing.T) {
+   lines := []string{
+      "467..114..",
+      "...*......",
+      "..35..633.",
+      "......#...",
+      "617*......",
+      ".....+.58.",
+      "..592.....",
+      "......755.",
+      "...$.*....",
+      ".664.598..",
+   }
+
+   sumOfGearRatios := SumOfGearRatios(lines)
+
+   if sumOfGearRatios != 467835 {
+      t.Fatal()
+   }
+}

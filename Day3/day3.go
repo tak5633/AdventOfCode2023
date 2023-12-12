@@ -38,6 +38,20 @@ func Part1() {
    fmt.Println("Sum of Part Numbers:", sumOfPartNumbers)
 }
 
+func Part2() {
+   fmt.Println("Part 2")
+
+   input, err := os.ReadFile("./input.txt")
+   check(err)
+
+   inputStr := string(input)
+   inputLines := strings.Split(inputStr, "\n")
+
+   sumOfGearRatios := SumOfGearRatios(inputLines)
+
+   fmt.Println("Sum of Gear Ratios:", sumOfGearRatios)
+}
+
 func check(pE error) {
    if pE != nil {
       panic(pE)
@@ -218,6 +232,49 @@ func IsSymbol(pRune rune) bool {
    return true
 }
 
+func SumOfGearRatios(pLines []string) int {
+
+   sum := 0
+
+   potentialGears := FindAllPotentialGears(pLines)
+
+   for _, gearPartNumbers := range potentialGears {
+      if len(gearPartNumbers) == 2 {
+         sum += gearPartNumbers[0] * gearPartNumbers[1]
+      }
+   }
+
+   return sum
+}
+
+func FindAllPotentialGears(pLines []string) map[string][]int {
+
+   potentialGears := map[string][]int{}
+
+   partNumbers := FindPartNumbers(pLines)
+
+   for _, partNumber := range partNumbers {
+      numberRange := partNumber.mRange
+      numberRow := partNumber.mRow
+      numberCol := numberRange.mStartIdx
+      numberLength := numberRange.mEndIdx - numberRange.mStartIdx + 1
+
+      borderIndexes := GetBorderIndexes(numberRow, numberCol, numberLength)
+
+      for _, borderIndex := range borderIndexes {
+         borderRune, err := GetRune(pLines, borderIndex.mRow, borderIndex.mCol)
+
+         if err == nil && borderRune == '*' {
+            key := fmt.Sprint(borderIndex.mRow) + "," + fmt.Sprint(borderIndex.mCol)
+            potentialGears[key] = append(potentialGears[key], partNumber.mNumber)
+         }
+      }
+   }
+
+   return potentialGears
+}
+
 func main() {
    Part1()
+   Part2()
 }
