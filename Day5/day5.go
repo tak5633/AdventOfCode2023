@@ -24,36 +24,104 @@ type MapEntry struct {
 
 func main() {
    Part1()
+   // Part2()
+   Part2GoRoutine()
 }
 
 func Part1() {
    fmt.Println("Part 1")
 
+   inputLines := ReadInput()
+
+   seedNumbers := ParseSeedNumbers(inputLines[0])
+   categoryMaps := ParseCategoryMaps(inputLines)
+
+   minLocationNumber := GetMinLocationNumber(categoryMaps, seedNumbers)
+
+   fmt.Println("Minimum Location Number:", minLocationNumber)
+}
+
+func Part2() {
+   fmt.Println("Part 2")
+
+   inputLines := ReadInput()
+
+   totalSeedNumbers := ParseSeedNumbers(inputLines[0])
+   numSeedRanges := len(totalSeedNumbers)/2
+
+   categoryMaps := ParseCategoryMaps(inputLines)
+   minLocationNumber := math.MaxInt
+
+   for i := 0; i < numSeedRanges; i++ {
+      fmt.Println("Seed Range:", i+1, "of", numSeedRanges)
+      rangeSeedNumbers := GetSeedRange(inputLines[0], i)
+
+      minRangeLocationNumber := GetMinLocationNumber(categoryMaps, rangeSeedNumbers)
+      minLocationNumber = int(math.Min(float64(minLocationNumber), float64(minRangeLocationNumber)))
+   }
+
+   fmt.Println("Minimum Location Number:", minLocationNumber)
+}
+
+func Part2GoRoutine() {
+   fmt.Println("Part 2 - Go Routine")
+
+   inputLines := ReadInput()
+
+   totalSeedNumbers := ParseSeedNumbers(inputLines[0])
+   numSeedRanges := len(totalSeedNumbers)/2
+
+   categoryMaps := ParseCategoryMaps(inputLines)
+   minLocationNumber := math.MaxInt
+
+   c := make(chan int)
+   for i := 0; i < numSeedRanges; i++ {
+      fmt.Println("Sending Seed Range:", i+1, "of", numSeedRanges)
+      rangeSeedNumbers := GetSeedRange(inputLines[0], i)
+
+      go GetMinLocationNumberGoRoutine(categoryMaps, rangeSeedNumbers, c)
+   }
+
+   for i := 0; i < numSeedRanges; i++ {
+      fmt.Println("Recveiving Seed Range:", i+1, "of", numSeedRanges)
+      minRangeLocationNumber := <-c
+      minLocationNumber = int(math.Min(float64(minLocationNumber), float64(minRangeLocationNumber)))
+   }
+
+   fmt.Println("Minimum Location Number:", minLocationNumber)
+}
+
+func ReadInput() []string {
    input, err := os.ReadFile("./input.txt")
    check(err)
 
    inputStr := strings.TrimSpace(string(input))
    inputLines := strings.Split(inputStr, "\n")
 
-   seedNumbers := ParseSeedNumbers(inputLines[0])
-   categoryMaps := ParseCategoryMaps(inputLines)
-
-   minLocationNumber := math.MaxInt
-
-   for _, seedNumber := range seedNumbers {
-      seedMap, found := GetCategoryMap(categoryMaps, "seed") ; if found == true {
-         seedLocationNumber := seedMap.FindNumber(seedNumber, "location")
-         minLocationNumber = int(math.Min(float64(minLocationNumber), float64(seedLocationNumber)))
-      }
-   }
-
-   fmt.Println("Minimum Location Number:", minLocationNumber)
+   return inputLines
 }
 
 func check(pE error) {
    if pE != nil {
       panic(pE)
    }
+}
+
+func GetSeedRange(pLine string, pRangeIdx int) []int {
+   seedNumbers := ParseSeedNumbers(pLine)
+
+   i := pRangeIdx*2
+
+   seedNumberStart := seedNumbers[i+0]
+   numSeedNumbers := seedNumbers[i+1]
+
+   rangeSeedNumbers := make([]int, numSeedNumbers)
+
+   for j := 0; j < int(numSeedNumbers); j++ {
+      rangeSeedNumbers[j] = int(seedNumberStart)+j
+   }
+
+   return rangeSeedNumbers
 }
 
 func ParseSeedNumbers(pLine string) []int {
@@ -195,6 +263,23 @@ func GetCategoryMap(pCategoryMaps []CategoryMap, pSource string) (CategoryMap, b
    }
 
    return CategoryMap{}, false
+}
+
+func GetMinLocationNumberGoRoutine(pCategoryMaps []CategoryMap, pSeedNumbers []int, pChan chan int) {
+   pChan <- GetMinLocationNumber(pCategoryMaps, pSeedNumbers)
+}
+
+func GetMinLocationNumber(pCategoryMaps []CategoryMap, pSeedNumbers []int) int {
+   minLocationNumber := math.MaxInt
+
+   for _, seedNumber := range pSeedNumbers {
+      seedMap, found := GetCategoryMap(pCategoryMaps, "seed") ; if found == true {
+         seedLocationNumber := seedMap.FindNumber(seedNumber, "location")
+         minLocationNumber = int(math.Min(float64(minLocationNumber), float64(seedLocationNumber)))
+      }
+   }
+
+   return minLocationNumber
 }
 
 func (categoryMap *CategoryMap) FindNumber(pSourceNumber int, pTargetDest string) int {
