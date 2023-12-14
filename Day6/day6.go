@@ -16,6 +16,7 @@ type Race struct {
 
 func main() {
    Part1()
+   Part2()
 }
 
 func Part1() {
@@ -23,7 +24,18 @@ func Part1() {
 
    inputLines := ReadInput()
 
-   races := ParseInput(inputLines)
+   races := ParseInputDay1(inputLines)
+   numNewRecordsMultiplied := ComputeNumNewRecordsMultiplied(races)
+
+   fmt.Println("Num New Records Multiplied:", numNewRecordsMultiplied)
+}
+
+func Part2() {
+   fmt.Println("Part 2")
+
+   inputLines := ReadInput()
+
+   races := ParseInputDay2(inputLines)
    numNewRecordsMultiplied := ComputeNumNewRecordsMultiplied(races)
 
    fmt.Println("Num New Records Multiplied:", numNewRecordsMultiplied)
@@ -39,14 +51,21 @@ func ReadInput() []string {
    return inputLines
 }
 
-func ParseInput(pLines []string) []Race {
-   timeInputs := ParseTimeInputs(pLines[0])
-   distanceRecordInputs := ParseDistanceRecordInputs(pLines[1])
+func ParseInputDay1(pLines []string) []Race {
+   timeInputs := ParseTimeInputsDay1(pLines[0])
+   distanceRecordInputs := ParseDistanceRecordInputsDay1(pLines[1])
 
    return ParseRaces(timeInputs, distanceRecordInputs)
 }
 
-func ParseTimeInputs(pInput string) []string {
+func ParseInputDay2(pLines []string) []Race {
+   timeInputs := ParseTimeInputsDay2(pLines[0])
+   distanceRecordInputs := ParseDistanceRecordInputsDay2(pLines[1])
+
+   return ParseRaces(timeInputs, distanceRecordInputs)
+}
+
+func ParseTimeInputsDay1(pInput string) []string {
    timeInfo := strings.SplitN(pInput, ":", 2)
 
    if len(timeInfo) != 2 {
@@ -58,7 +77,13 @@ func ParseTimeInputs(pInput string) []string {
    return RemoveEmptyStrings(timeInputs)
 }
 
-func ParseDistanceRecordInputs(pInput string) []string {
+func ParseTimeInputsDay2(pInput string) []string {
+   input := RemoveSpaces(pInput)
+
+   return ParseTimeInputsDay1(input)
+}
+
+func ParseDistanceRecordInputsDay1(pInput string) []string {
    distanceRecordInfo := strings.SplitN(pInput, ":", 2)
 
    if len(distanceRecordInfo) != 2 {
@@ -68,6 +93,12 @@ func ParseDistanceRecordInputs(pInput string) []string {
    distanceRecordInputs := strings.Split(distanceRecordInfo[1], " ")
 
    return RemoveEmptyStrings(distanceRecordInputs)
+}
+
+func ParseDistanceRecordInputsDay2(pInput string) []string {
+   input := RemoveSpaces(pInput)
+
+   return ParseDistanceRecordInputsDay1(input)
 }
 
 func RemoveEmptyStrings(pInputs []string) []string {
@@ -80,6 +111,19 @@ func RemoveEmptyStrings(pInputs []string) []string {
    }
 
    return nonEmptyInputs
+}
+
+func RemoveSpaces(pInput string) string {
+   output := ""
+   inputSplit := strings.Split(pInput, " ")
+
+   for _, inputElement := range inputSplit {
+      if inputElement != "" {
+         output += inputElement
+      }
+   }
+
+   return output
 }
 
 func ParseRaces(pTimeInputs []string, pDistanceRecordInputs []string) []Race {

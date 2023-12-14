@@ -5,13 +5,13 @@ import (
 )
 
 func Test_ParseInputs(t *testing.T) {
-   timeInputs := ParseTimeInputs("Time:      7  15   30")
+   timeInputs := ParseTimeInputsDay1("Time:      7  15   30")
 
    if len(timeInputs) != 3 {
       t.Fatal()
    }
 
-   recordDistanceInputs := ParseDistanceRecordInputs("Distance:  9  40  200")
+   recordDistanceInputs := ParseDistanceRecordInputsDay1("Distance:  9  40  200")
 
    if len(recordDistanceInputs) != 3 {
       t.Fatal()
@@ -47,7 +47,7 @@ func Test_ComputeNumNewRecordsMultiplied(t *testing.T) {
       "Distance:  9  40  200",
    }
 
-   races := ParseInput(lines)
+   races := ParseInputDay1(lines)
    numNewRecordsMultiplied := ComputeNumNewRecordsMultiplied(races)
 
    if len(races) != 3 {
@@ -55,6 +55,22 @@ func Test_ComputeNumNewRecordsMultiplied(t *testing.T) {
    }
 
    if numNewRecordsMultiplied != 288 {
+      t.Fatal()
+   }
+
+   lines = []string{
+      "Time:      71530",
+      "Distance:  940200",
+   }
+
+   races = ParseInputDay1(lines)
+   numNewRecordsMultiplied = ComputeNumNewRecordsMultiplied(races)
+
+   if len(races) != 1 {
+      t.Fatal()
+   }
+
+   if numNewRecordsMultiplied != 71503 {
       t.Fatal()
    }
 }
