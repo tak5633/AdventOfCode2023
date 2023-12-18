@@ -6,22 +6,22 @@ import (
 )
 
 func Test_Part1Card_Strength(t *testing.T) {
-   Check_Part1Card_Strength(t, Part1Card{'A'}, 14)
-   Check_Part1Card_Strength(t, Part1Card{'K'}, 13)
-   Check_Part1Card_Strength(t, Part1Card{'Q'}, 12)
-   Check_Part1Card_Strength(t, Part1Card{'J'}, 11)
-   Check_Part1Card_Strength(t, Part1Card{'T'}, 10)
-   Check_Part1Card_Strength(t, Part1Card{'9'}, 9)
-   Check_Part1Card_Strength(t, Part1Card{'8'}, 8)
-   Check_Part1Card_Strength(t, Part1Card{'7'}, 7)
-   Check_Part1Card_Strength(t, Part1Card{'6'}, 6)
-   Check_Part1Card_Strength(t, Part1Card{'5'}, 5)
-   Check_Part1Card_Strength(t, Part1Card{'4'}, 4)
-   Check_Part1Card_Strength(t, Part1Card{'3'}, 3)
-   Check_Part1Card_Strength(t, Part1Card{'2'}, 2)
+   Check_Card_Strength(t, &Part1Card{'A'}, 14)
+   Check_Card_Strength(t, &Part1Card{'K'}, 13)
+   Check_Card_Strength(t, &Part1Card{'Q'}, 12)
+   Check_Card_Strength(t, &Part1Card{'J'}, 11)
+   Check_Card_Strength(t, &Part1Card{'T'}, 10)
+   Check_Card_Strength(t, &Part1Card{'9'}, 9)
+   Check_Card_Strength(t, &Part1Card{'8'}, 8)
+   Check_Card_Strength(t, &Part1Card{'7'}, 7)
+   Check_Card_Strength(t, &Part1Card{'6'}, 6)
+   Check_Card_Strength(t, &Part1Card{'5'}, 5)
+   Check_Card_Strength(t, &Part1Card{'4'}, 4)
+   Check_Card_Strength(t, &Part1Card{'3'}, 3)
+   Check_Card_Strength(t, &Part1Card{'2'}, 2)
 }
 
-func Check_Part1Card_Strength(t *testing.T, pCard Part1Card, pExpectedStrength int) {
+func Check_Card_Strength(t *testing.T, pCard CardInt, pExpectedStrength int) {
    strength := pCard.Strength()
 
    if strength != pExpectedStrength {
@@ -210,4 +210,21 @@ func Test_GetTotalWinnings_Simple(t *testing.T) {
    if totalWinnings != 1645 {
       t.Fatal()
    }
+}
+
+func Test_Part2Card_Strength(t *testing.T) {
+   Check_Card_Strength(t, &Part2Card{'A'}, 14)
+   Check_Card_Strength(t, &Part2Card{'K'}, 13)
+   Check_Card_Strength(t, &Part2Card{'Q'}, 12)
+
+   Check_Card_Strength(t, &Part2Card{'T'}, 10)
+   Check_Card_Strength(t, &Part2Card{'9'}, 9)
+   Check_Card_Strength(t, &Part2Card{'8'}, 8)
+   Check_Card_Strength(t, &Part2Card{'7'}, 7)
+   Check_Card_Strength(t, &Part2Card{'6'}, 6)
+   Check_Card_Strength(t, &Part2Card{'5'}, 5)
+   Check_Card_Strength(t, &Part2Card{'4'}, 4)
+   Check_Card_Strength(t, &Part2Card{'3'}, 3)
+   Check_Card_Strength(t, &Part2Card{'2'}, 2)
+   Check_Card_Strength(t, &Part2Card{'J'}, 1)
 }
