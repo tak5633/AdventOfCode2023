@@ -1,95 +1,163 @@
 package main
 
 import (
-	"fmt"
 	"sort"
 	"testing"
 )
 
-func Test_GetCardStrength(t *testing.T) {
-   CheckCardStrength(t, 'A', 14)
-   CheckCardStrength(t, 'K', 13)
-   CheckCardStrength(t, 'Q', 12)
-   CheckCardStrength(t, 'J', 11)
-   CheckCardStrength(t, 'T', 10)
-   CheckCardStrength(t, '9', 9)
-   CheckCardStrength(t, '8', 8)
-   CheckCardStrength(t, '7', 7)
-   CheckCardStrength(t, '6', 6)
-   CheckCardStrength(t, '5', 5)
-   CheckCardStrength(t, '4', 4)
-   CheckCardStrength(t, '3', 3)
-   CheckCardStrength(t, '2', 2)
+func Test_Part1Card_Strength(t *testing.T) {
+   Check_Part1Card_Strength(t, Part1Card{'A'}, 14)
+   Check_Part1Card_Strength(t, Part1Card{'K'}, 13)
+   Check_Part1Card_Strength(t, Part1Card{'Q'}, 12)
+   Check_Part1Card_Strength(t, Part1Card{'J'}, 11)
+   Check_Part1Card_Strength(t, Part1Card{'T'}, 10)
+   Check_Part1Card_Strength(t, Part1Card{'9'}, 9)
+   Check_Part1Card_Strength(t, Part1Card{'8'}, 8)
+   Check_Part1Card_Strength(t, Part1Card{'7'}, 7)
+   Check_Part1Card_Strength(t, Part1Card{'6'}, 6)
+   Check_Part1Card_Strength(t, Part1Card{'5'}, 5)
+   Check_Part1Card_Strength(t, Part1Card{'4'}, 4)
+   Check_Part1Card_Strength(t, Part1Card{'3'}, 3)
+   Check_Part1Card_Strength(t, Part1Card{'2'}, 2)
 }
 
-func CheckCardStrength(t *testing.T, pCard rune, pExpectedStrength int) {
-   strength, err := GetCardStrength(pCard)
+func Check_Part1Card_Strength(t *testing.T, pCard Part1Card, pExpectedStrength int) {
+   strength := pCard.Strength()
 
-   if err != nil || strength != pExpectedStrength {
-      t.Fatal()
-   }
-}
-
-func Test_Hand_GetTypeStrength(t *testing.T) {
-   hand := Hand{[]rune{'3', '2', 'T', '3', 'K'}, 765}
-
-   if hand.GetTypeStrength() != 1 {
-      t.Fatal()
-   }
-
-   hand = Hand{[]rune{'T', '5', '5', 'J', '5'}, 684}
-
-   if hand.GetTypeStrength() != 3 {
-      t.Fatal()
-   }
-
-   hand = Hand{[]rune{'K', 'K', '6', '7', '7'}, 28}
-
-   if hand.GetTypeStrength() != 2 {
-      t.Fatal()
-   }
-
-   hand = Hand{[]rune{'K', 'T', 'J', 'J', 'T'}, 220}
-
-   if hand.GetTypeStrength() != 2 {
-      t.Fatal()
-   }
-
-   hand = Hand{[]rune{'Q', 'Q', 'Q', 'J', 'A'}, 483}
-
-   if hand.GetTypeStrength() != 3 {
+   if strength != pExpectedStrength {
       t.Fatal()
    }
 }
 
-func Test_Hands_Order(t *testing.T) {
-   hands := Hands{
-      Hand{[]rune{'3', '2', 'T', '3', 'K'}, 765},
-      Hand{[]rune{'T', '5', '5', 'J', '5'}, 684},
-      Hand{[]rune{'K', 'K', '6', '7', '7'}, 28},
-      Hand{[]rune{'K', 'T', 'J', 'J', 'T'}, 220},
-      Hand{[]rune{'Q', 'Q', 'Q', 'J', 'A'}, 483},
+func Test_Part1Hand_Strength(t *testing.T) {
+   hand := Part1Hand{}
+   hand.AddCard('3')
+   hand.AddCard('2')
+   hand.AddCard('T')
+   hand.AddCard('3')
+   hand.AddCard('K')
+   hand.SetBid(765)
+
+   if hand.Strength() != 1 {
+      t.Fatal()
    }
+
+   hand = Part1Hand{}
+   hand.AddCard('T')
+   hand.AddCard('5')
+   hand.AddCard('5')
+   hand.AddCard('J')
+   hand.AddCard('5')
+   hand.SetBid(684)
+
+   if hand.Strength() != 3 {
+      t.Fatal()
+   }
+
+   hand = Part1Hand{}
+   hand.AddCard('K')
+   hand.AddCard('K')
+   hand.AddCard('6')
+   hand.AddCard('7')
+   hand.AddCard('7')
+   hand.SetBid(28)
+
+   if hand.Strength() != 2 {
+      t.Fatal()
+   }
+
+   hand = Part1Hand{}
+   hand.AddCard('K')
+   hand.AddCard('T')
+   hand.AddCard('J')
+   hand.AddCard('J')
+   hand.AddCard('T')
+   hand.SetBid(220)
+
+   if hand.Strength() != 2 {
+      t.Fatal()
+   }
+
+   hand = Part1Hand{}
+   hand.AddCard('Q')
+   hand.AddCard('Q')
+   hand.AddCard('Q')
+   hand.AddCard('J')
+   hand.AddCard('A')
+   hand.SetBid(483)
+
+   if hand.Strength() != 3 {
+      t.Fatal()
+   }
+}
+
+func Test_Part1Hands_Order(t *testing.T) {
+   hands := Hands{}
+
+   hand := new(Part1Hand)
+   hand.AddCard('3')
+   hand.AddCard('2')
+   hand.AddCard('T')
+   hand.AddCard('3')
+   hand.AddCard('K')
+   hand.SetBid(765)
+   hands = append(hands, hand)
+
+   hand = new(Part1Hand)
+   hand.AddCard('T')
+   hand.AddCard('5')
+   hand.AddCard('5')
+   hand.AddCard('J')
+   hand.AddCard('5')
+   hand.SetBid(684)
+   hands = append(hands, hand)
+
+   hand = new(Part1Hand)
+   hand.AddCard('K')
+   hand.AddCard('K')
+   hand.AddCard('6')
+   hand.AddCard('7')
+   hand.AddCard('7')
+   hand.SetBid(28)
+   hands = append(hands, hand)
+
+   hand = new(Part1Hand)
+   hand.AddCard('K')
+   hand.AddCard('T')
+   hand.AddCard('J')
+   hand.AddCard('J')
+   hand.AddCard('T')
+   hand.SetBid(220)
+   hands = append(hands, hand)
+
+   hand = new(Part1Hand)
+   hand.AddCard('Q')
+   hand.AddCard('Q')
+   hand.AddCard('Q')
+   hand.AddCard('J')
+   hand.AddCard('A')
+   hand.SetBid(483)
+   hands = append(hands, hand)
 
    sort.Sort(Hands(hands))
 
-   if hands[0].mBid != 765 {
+   if hands[0].Bid() != 765 {
       t.Fatal()
    }
 
-   if hands[1].mBid != 220 {
+   if hands[1].Bid() != 220 {
       t.Fatal()
    }
 
-   if hands[2].mBid != 28 {
+   if hands[2].Bid() != 28 {
       t.Fatal()
    }
 
-   if hands[3].mBid != 684 {
+   if hands[3].Bid() != 684 {
       t.Fatal()
    }
 
-   if hands[4].mBid != 483 {
+   if hands[4].Bid() != 483 {
       t.Fatal()
    }
 }
@@ -103,7 +171,7 @@ func Test_GetTotalWinnings_Example(t *testing.T) {
       "QQQJA 483",
    }
 
-   hands := ParseHands(lines)
+   hands := ParseHands(lines, Part1HandCreator)
    totalWinnings := GetTotalWinnings(hands)
 
    if totalWinnings != 6440 {
@@ -117,24 +185,23 @@ func Test_GetTotalWinnings_Simple(t *testing.T) {
       "JJJJJ 396",
    }
 
-   hands := ParseHands(lines)
+   hands := ParseHands(lines, Part1HandCreator)
 
-   if hands[0].GetTypeStrength() != 1 {
+   if hands[0].Strength() != 1 {
       t.Fatal()
    }
 
-   if hands[1].GetTypeStrength() != 6 {
-      fmt.Println(hands[1].GetTypeStrength())
+   if hands[1].Strength() != 6 {
       t.Fatal()
    }
 
    sort.Sort(hands)
 
-   if hands[0].mBid != 853 {
+   if hands[0].Bid() != 853 {
       t.Fatal()
    }
 
-   if hands[1].mBid != 396 {
+   if hands[1].Bid() != 396 {
       t.Fatal()
    }
 
