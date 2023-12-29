@@ -13,6 +13,7 @@ type EnvVar struct {
 
 func main() {
    Part1()
+   Part2()
 }
 
 func Part1() {
@@ -24,6 +25,17 @@ func Part1() {
    extrapolatedReadingsSum := SumExtrapolatedReadings(envVars)
 
    fmt.Println("Sum of Extrapolated Readings:", extrapolatedReadingsSum)
+}
+
+func Part2() {
+   fmt.Println("Part 2")
+
+   inputLines := ReadInput()
+
+   envVars := ParseEnvVars(inputLines)
+   extrapolatedReadingsSum := SumBackwardExtrapolatedReadings(envVars)
+
+   fmt.Println("Sum of Backward Extrapolated Readings:", extrapolatedReadingsSum)
 }
 
 func ReadInput() []string {
@@ -77,6 +89,16 @@ func SumExtrapolatedReadings(pEnvVars []EnvVar) int {
    return extrapolatedReadingsSum
 }
 
+func SumBackwardExtrapolatedReadings(pEnvVars []EnvVar) int {
+   extrapolatedReadingsSum := 0
+
+   for _, envVar := range pEnvVars {
+      extrapolatedReadingsSum += envVar.ExtrapolateBackwards()
+   }
+
+   return extrapolatedReadingsSum
+}
+
 func (envVar *EnvVar) Extrapolate() int {
 
    extrapolatedReading := 0
@@ -85,6 +107,19 @@ func (envVar *EnvVar) Extrapolate() int {
 
    for i := len(readingDiffs)-2; i >= 0; i-- {
       extrapolatedReading += readingDiffs[i][len(readingDiffs[i])-1]
+   }
+
+   return extrapolatedReading
+}
+
+func (envVar *EnvVar) ExtrapolateBackwards() int {
+
+   extrapolatedReading := 0
+
+   readingDiffs := envVar.ReadingDiffs()
+
+   for i := len(readingDiffs)-2; i >= 0; i-- {
+      extrapolatedReading = readingDiffs[i][0] - extrapolatedReading
    }
 
    return extrapolatedReading

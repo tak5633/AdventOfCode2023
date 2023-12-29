@@ -112,3 +112,14 @@ func Test_EnvVar_Extrapolate(t *testing.T) {
       t.Fatal()
    }
 }
+
+func Test_EnvVar_ExtrapolateBackwards(t *testing.T) {
+   envVar := EnvVar{}
+   envVar.mReadings = []int{10, 13, 16, 21, 30, 45}
+
+   extrapolatedReading := envVar.ExtrapolateBackwards()
+
+   if extrapolatedReading != 5 {
+      t.Fatal()
+   }
+}
