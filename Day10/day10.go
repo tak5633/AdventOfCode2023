@@ -7,15 +7,37 @@ import (
 	"strings"
 )
 
+type Direction int
+
 const (
-   Up = iota
+   Up Direction = iota
    Down
    Left
    Right
 )
 
+type Position struct {
+   mIsStart bool
+   mRow int
+   mCol int
+   mInputDirection Direction
+   mOutputDirection Direction
+   mPrevPosition *Position
+   mNextPosition *Position
+}
+
+type Tile int
+
+const (
+   Inner Tile = iota
+   Outer
+   Loop
+   NoType
+)
+
 func main() {
    Part1()
+   Part2()
 }
 
 func Part1() {
@@ -31,16 +53,48 @@ func Part1() {
    startingPipes := FindPossibleStartingPipes(inputLines, startingRow, startingCol)
    fmt.Println("Starting Pipes:", string(startingPipes))
 
-   allNumPipes := CheckStartingPipes(inputLines, startingRow, startingCol, startingPipes)
-   fmt.Println("All Num Pipes:", allNumPipes)
+   allPositions := CheckStartingPipes(inputLines, startingRow, startingCol, startingPipes)
 
+   allNumPipes := []int{}
    allNumSteps := []float32{}
 
-   for _, numPipes := range allNumPipes {
+   for _, positions := range allPositions {
+      numPipes := len(positions)
+      allNumPipes = append(allNumPipes, numPipes)
       allNumSteps = append(allNumSteps, float32(numPipes)/2.0)
    }
 
+   fmt.Println("All Num Pipes:", allNumPipes)
    fmt.Println("All Num Steps:", allNumSteps)
+}
+
+func Part2() {
+   fmt.Println("Part 2")
+
+   inputLines := ReadInput()
+
+   startingRow, startingCol, err := FindStartingPosition(inputLines)
+   check(err)
+
+   fmt.Println("Starting Position:", startingRow, ",", startingCol)
+
+   startingPipes := FindPossibleStartingPipes(inputLines, startingRow, startingCol)
+   fmt.Println("Starting Pipes:", string(startingPipes))
+
+   allPositions := CheckStartingPipes(inputLines, startingRow, startingCol, startingPipes)
+
+   for i, positions := range allPositions {
+      fmt.Println("Positions Idx:", i)
+
+      numCumulativeClockwiseTurns := GetNumCumulativeClockwiseTurns(positions)
+      fmt.Println("Num Cumulative Clockwise Turns:", numCumulativeClockwiseTurns)
+
+      numRows := len(inputLines)
+      numCols := len(inputLines[0])
+
+      numEnclosedTiles := GetNumEnclosedTiles(numRows, numCols, positions)
+      fmt.Println("Num Enclosed Tiles:", numEnclosedTiles)
+   }
 }
 
 func ReadInput() []string {
@@ -129,39 +183,28 @@ func FindPossibleStartingPipes(pLines []string, pStartingRow int, pStartingCol i
    return startingPipes
 }
 
-func CheckStartingPipes(pLines []string, pStartingRow int, pStartingCol int, pStartingPipes []rune) []int {
-   allNumPipes := []int{}
+func CheckStartingPipes(pLines []string, pStartingRow int, pStartingCol int, pStartingPipes []rune) [][]*Position {
+   allPositions := [][]*Position{}
 
    for _, startingPipe := range pStartingPipes {
-      numPipes, err := CheckStartingPipe(pLines, pStartingRow, pStartingCol, startingPipe)
+      positions, err := CheckStartingPipe(pLines, pStartingRow, pStartingCol, startingPipe)
 
       if err == nil {
-         allNumPipes = append(allNumPipes, numPipes)
+         allPositions = append(allPositions, positions)
       }
    }
 
-   return allNumPipes
+   return allPositions
 }
 
-func CheckStartingPipe(pLines []string, pStartingRow int, pStartingCol int, pStartingPipe rune) (int, error) {
+func CheckStartingPipe(pLines []string, pStartingRow int, pStartingCol int, pStartingPipe rune) ([]*Position, error) {
 
    row := pStartingRow
    col := pStartingCol
-   direction := Up
+   direction, err := GetStartingDirection(pStartingPipe)
 
-   switch pStartingPipe {
-   case '|':
-      direction = Up
-   case '-':
-      direction = Right
-   case 'L':
-      direction = Up
-   case 'J':
-      direction = Up
-   case '7':
-      direction = Down
-   case 'F':
-      direction = Down
+   if err != nil {
+      return []*Position{}, err
    }
 
    positionMap := map[string]bool{}
@@ -169,41 +212,80 @@ func CheckStartingPipe(pLines []string, pStartingRow int, pStartingCol int, pSta
    positionKey := fmt.Sprintf("%d,%d", pStartingRow, pStartingCol)
    positionMap[positionKey] = true
 
-   numPipes := 0
-   var err error = nil
+   positions := []*Position{}
+
+   startingPosition := Position{}
+   startingPosition.mIsStart = true
+   startingPosition.mRow = row
+   startingPosition.mCol = col
+   startingPosition.mOutputDirection = direction
+   positions = append(positions, &startingPosition)
 
    for {
       row, col, err = GetNextPosition(pLines, row, col, direction)
 
       if err != nil {
-         return -1, err
+         return []*Position{}, err
       }
 
-      numPipes += 1
-
       if row == pStartingRow && col == pStartingCol {
-         return numPipes, nil
+         positions[0].mInputDirection = positions[len(positions)-1].mOutputDirection
+         positions[0].mPrevPosition = positions[len(positions)-1]
+
+         return positions, nil
       }
 
       positionKey := fmt.Sprintf("%d,%d", row, col)
 
       if _, ok := positionMap[positionKey] ; ok {
-         return -1, errors.New("CheckStartingPipe: Position has already been visited")
+         return []*Position{}, errors.New("CheckStartingPipe: Position has already been visited")
       }
 
       if pLines[row][col] == '.' {
-         return -1, errors.New("CheckStartingPipe: The end of the pipe has been reached")
+         return []*Position{}, errors.New("CheckStartingPipe: The end of the pipe has been reached")
       }
+
+      position := Position{}
+      position.mIsStart = false
+      position.mRow = row
+      position.mCol = col
+      position.mInputDirection = direction
+
+      position.mPrevPosition = positions[len(positions)-1]
+      positions[len(positions)-1].mNextPosition = &position
 
       direction, err = GetNextDirection(pLines, row, col, direction)
 
       if err != nil {
-         return -1, err
+         return []*Position{}, err
       }
+
+      position.mOutputDirection = direction
+      positions = append(positions, &position)
    }
 }
 
-func GetNextPosition(pLines []string, pRow int, pCol int, pDirection int) (int, int, error) {
+func GetStartingDirection(pStartingPipe rune) (Direction, error) {
+
+   switch pStartingPipe {
+   case '|':
+      return Up, nil
+   case '-':
+      return Right, nil
+   case 'L':
+      return Up, nil
+   case 'J':
+      return Up, nil
+   case '7':
+      return Down, nil
+   case 'F':
+      return Down, nil
+   }
+
+   return Up, errors.New("GetStartingDirection: Failed to determine the starting direction")
+}
+
+func GetNextPosition(pLines []string, pRow int, pCol int, pDirection Direction) (int, int, error) {
 
    nextPositionError := errors.New("GetNextPosition: The next position exceeds the bounds")
 
@@ -236,7 +318,7 @@ func GetNextPosition(pLines []string, pRow int, pCol int, pDirection int) (int, 
    return -1, -1, nextPositionError
 }
 
-func GetNextDirection(pLines []string, pRow int, pCol int, pDirection int) (int, error) {
+func GetNextDirection(pLines []string, pRow int, pCol int, pDirection Direction) (Direction, error) {
 
    pipe := pLines[pRow][pCol]
 
@@ -280,4 +362,202 @@ func GetNextDirection(pLines []string, pRow int, pCol int, pDirection int) (int,
    }
 
    return -1, errors.New("GetNextDirection: The next direction could not be determined")
+}
+
+func GetNumEnclosedTiles(pNumRows int, pNumCols int, pPositions []*Position) int {
+   tileMap := map[string]Tile{}
+
+   // Initialize the map
+   for row := 0; row < pNumRows; row++ {
+      for col := 0; col < pNumCols; col++ {
+         tileKey := fmt.Sprintf("%d,%d", row, col)
+         tileMap[tileKey] = NoType
+      }
+   }
+
+   // Identify the loop tiles
+   for _, position := range pPositions {
+      tileKey := fmt.Sprintf("%d,%d", position.mRow, position.mCol)
+      tileMap[tileKey] = Loop
+   }
+
+   numCumulativeClockwiseTurns := GetNumCumulativeClockwiseTurns(pPositions)
+   isClockwiseLoop := numCumulativeClockwiseTurns > 0
+
+   for _, position := range pPositions {
+
+      // Mark inner tiles by adjusting the row
+      row := position.mRow
+      col := position.mCol
+      var err error = nil
+
+      for {
+         row, col, err = GetNextInnerRowPosition(row, col, position.mInputDirection, position.mOutputDirection, isClockwiseLoop)
+
+         tileKey := fmt.Sprintf("%d,%d", row, col)
+
+         if row < 0 || pNumRows <= row || col < 0 || pNumCols <= col || err != nil || tileMap[tileKey] == Loop {
+            break
+         }
+
+         tileMap[tileKey] = Inner
+      }
+
+      // Mark inner tiles by adjusting the column
+      row = position.mRow
+      col = position.mCol
+      err = nil
+
+      for {
+         row, col, err = GetNextInnerColPosition(row, col, position.mInputDirection, position.mOutputDirection, isClockwiseLoop)
+
+         tileKey := fmt.Sprintf("%d,%d", row, col)
+
+         if row < 0 || pNumRows <= row || col < 0 || pNumCols <= col || err != nil || tileMap[tileKey] == Loop {
+            break
+         }
+
+         tileMap[tileKey] = Inner
+      }
+   }
+
+   numEnclosedTiles := 0
+
+   for _, tile := range tileMap {
+      if tile == Inner {
+         numEnclosedTiles++
+      }
+   }
+
+   return numEnclosedTiles
+}
+
+func GetNumCumulativeClockwiseTurns(pPositions []*Position) int {
+
+   numCumulativeClockwiseTurns := 0
+
+   for i := 1; i < len(pPositions); i++ {
+      switch pPositions[i].mInputDirection {
+      case Up:
+         if pPositions[i].mOutputDirection == Right {
+            numCumulativeClockwiseTurns++
+         } else if pPositions[i].mOutputDirection == Left {
+            numCumulativeClockwiseTurns--
+         }
+      case Down:
+         if pPositions[i].mOutputDirection == Right {
+            numCumulativeClockwiseTurns--
+         } else if pPositions[i].mOutputDirection == Left {
+            numCumulativeClockwiseTurns++
+         }
+      case Left:
+         if pPositions[i].mOutputDirection == Up {
+            numCumulativeClockwiseTurns++
+         } else if pPositions[i].mOutputDirection == Down {
+            numCumulativeClockwiseTurns--
+         }
+      case Right:
+         if pPositions[i].mOutputDirection == Up {
+            numCumulativeClockwiseTurns--
+         } else if pPositions[i].mOutputDirection == Down {
+            numCumulativeClockwiseTurns++
+         }
+      }
+   }
+
+   return numCumulativeClockwiseTurns
+}
+
+func GetNextInnerRowPosition(pRow int, pCol int, pInputDirection Direction, pOutputDirection Direction, pIsClockwiseLoop bool) (int, int, error) {
+
+   // Straight pipe
+   if pInputDirection == pOutputDirection {
+      if pIsClockwiseLoop {
+         switch pInputDirection {
+         case Left:
+            return pRow-1, pCol, nil
+         case Right:
+            return pRow+1, pCol, nil
+         }
+      } else {
+         switch pInputDirection {
+         case Left:
+            return pRow+1, pCol, nil
+         case Right:
+            return pRow-1, pCol, nil
+         }
+      }
+   }
+
+   // Bent pipe
+   if pIsClockwiseLoop {
+      if pInputDirection == Up && pOutputDirection == Left {
+         return pRow-1, pCol, nil
+      } else if pInputDirection == Right && pOutputDirection == Up {
+         return pRow+1, pCol, nil
+      } else if pInputDirection == Down && pOutputDirection == Right {
+         return pRow+1, pCol, nil
+      } else if pInputDirection == Left && pOutputDirection == Down {
+         return pRow-1, pCol, nil
+      }
+   } else {
+      if pInputDirection == Up && pOutputDirection == Right {
+         return pRow-1, pCol, nil
+      } else if pInputDirection == Left && pOutputDirection == Up {
+         return pRow+1, pCol, nil
+      } else if pInputDirection == Down && pOutputDirection == Left {
+         return pRow+1, pCol, nil
+      } else if pInputDirection == Right && pOutputDirection == Down {
+         return pRow-1, pCol, nil
+      }
+   }
+
+   return pRow, pCol, errors.New("GetNextInnerRowPosition: Cannot retrieve next inner position")
+}
+
+func GetNextInnerColPosition(pRow int, pCol int, pInputDirection Direction, pOutputDirection Direction, pIsClockwiseLoop bool) (int, int, error) {
+
+   // Straight pipe
+   if pInputDirection == pOutputDirection {
+      if pIsClockwiseLoop {
+         switch pInputDirection {
+         case Up:
+            return pRow, pCol+1, nil
+         case Down:
+            return pRow, pCol-1, nil
+         }
+      } else {
+         switch pInputDirection {
+         case Up:
+            return pRow, pCol-1, nil
+         case Down:
+            return pRow, pCol+1, nil
+         }
+      }
+   }
+
+   // Bent pipe
+   if pIsClockwiseLoop {
+      if pInputDirection == Up && pOutputDirection == Left {
+         return pRow, pCol+1, nil
+      } else if pInputDirection == Right && pOutputDirection == Up {
+         return pRow, pCol+1, nil
+      } else if pInputDirection == Down && pOutputDirection == Right {
+         return pRow, pCol-1, nil
+      } else if pInputDirection == Left && pOutputDirection == Down {
+         return pRow, pCol-1, nil
+      }
+   } else {
+      if pInputDirection == Up && pOutputDirection == Right {
+         return pRow, pCol-1, nil
+      } else if pInputDirection == Left && pOutputDirection == Up {
+         return pRow, pCol-1, nil
+      } else if pInputDirection == Down && pOutputDirection == Left {
+         return pRow, pCol+1, nil
+      } else if pInputDirection == Right && pOutputDirection == Down {
+         return pRow, pCol+1, nil
+      }
+   }
+
+   return pRow, pCol, errors.New("GetNextInnerColPosition: Cannot retrieve next inner position")
 }
