@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	ci "day11/cosmicImage"
+   "testing"
+)
 
 //--------------------------------------------------------------------------------------------------
 //
@@ -19,9 +22,8 @@ func Test_CosmicImage_Expand(t *testing.T) {
       "#...#.....",
    }
 
-   cosmicImage := CosmicImage{}
-   cosmicImage.mImage = lines
-   cosmicImage.Expand()
+   cosmicImage := ci.CosmicImage{}
+   cosmicImage.SetImage(lines)
 
    expandedImage := []string{
       "....#........",
@@ -38,7 +40,7 @@ func Test_CosmicImage_Expand(t *testing.T) {
       "#....#.......",
    }
 
-   if len(cosmicImage.mImage) != len(expandedImage) {
+   if len(cosmicImage.Image()) != len(expandedImage) {
       t.Fatal()
    }
 }
@@ -60,12 +62,10 @@ func Test_CosmicImage_FindGalaxies(t *testing.T) {
       "#...#.....",
    }
 
-   cosmicImage := CosmicImage{}
-   cosmicImage.mImage = lines
-   cosmicImage.Expand()
-   cosmicImage.FindGalaxies()
+   cosmicImage := ci.CosmicImage{}
+   cosmicImage.SetImage(lines)
 
-   if len(cosmicImage.mGalaxies) != 9 {
+   if len(cosmicImage.Galaxies()) != 9 {
       t.Fatal()
    }
 }
@@ -87,10 +87,8 @@ func Test_ComputeGalaxyPaths(t *testing.T) {
       "#...#.....",
    }
 
-   cosmicImage := CosmicImage{}
-   cosmicImage.mImage = lines
-   cosmicImage.Expand()
-   cosmicImage.FindGalaxies()
+   cosmicImage := ci.CosmicImage{}
+   cosmicImage.SetImage(lines)
    galaxyPaths := cosmicImage.ComputeGalaxyPaths()
 
    if len(galaxyPaths) != 36 {
@@ -115,10 +113,8 @@ func Test_SumGalaxyPaths(t *testing.T) {
       "#...#.....",
    }
 
-   cosmicImage := CosmicImage{}
-   cosmicImage.mImage = lines
-   cosmicImage.Expand()
-   cosmicImage.FindGalaxies()
+   cosmicImage := ci.CosmicImage{}
+   cosmicImage.SetImage(lines)
    galaxyPaths := cosmicImage.ComputeGalaxyPaths()
    sumOfGalaxyPaths := SumGalaxyPaths(galaxyPaths)
 
