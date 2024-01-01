@@ -14,23 +14,25 @@ type Galaxy struct {
 
 type CosmicImage struct {
    mImage []string
+   mEmptyRows []int
+   mEmptyCols []int
+   mExpansionMultiplier int
    mGalaxies []Galaxy
 }
 
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
-func (cosmicImage *CosmicImage) Image() []string {
-   return cosmicImage.mImage
-}
+func NewCosmicImage(pImage []string, pExpansionMultiplier int) CosmicImage {
+   cosmicImage := CosmicImage{}
 
-//--------------------------------------------------------------------------------------------------
-//
-//--------------------------------------------------------------------------------------------------
-func (cosmicImage *CosmicImage) SetImage(pImage []string) {
    cosmicImage.mImage = pImage
+   cosmicImage.mExpansionMultiplier = pExpansionMultiplier
+
    cosmicImage.expand()
    cosmicImage.findGalaxies()
+
+   return cosmicImage
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -52,16 +54,12 @@ func (cosmicImage *CosmicImage) expand() {
 //
 //--------------------------------------------------------------------------------------------------
 func (cosmicImage *CosmicImage) expandRows() {
-   expandedImage := []string{}
 
-   for _, row := range cosmicImage.mImage {
-      expandedImage = append(expandedImage, row)
+   for rowIdx, row := range cosmicImage.mImage {
       if !strings.ContainsRune(row, '#') {
-         expandedImage = append(expandedImage, row)
+         cosmicImage.mEmptyRows = append(cosmicImage.mEmptyRows, rowIdx)
       }
    }
-
-   cosmicImage.mImage = expandedImage
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -69,17 +67,13 @@ func (cosmicImage *CosmicImage) expandRows() {
 //--------------------------------------------------------------------------------------------------
 func (cosmicImage *CosmicImage) expandCols() {
 
-   expandedImage := []string{}
    transposedImage := Transpose(cosmicImage.mImage)
 
-   for _, row := range transposedImage {
-      expandedImage = append(expandedImage, row)
+   for rowIdx, row := range transposedImage {
       if !strings.ContainsRune(row, '#') {
-         expandedImage = append(expandedImage, row)
+         cosmicImage.mEmptyCols = append(cosmicImage.mEmptyCols, rowIdx)
       }
    }
-
-   cosmicImage.mImage = Transpose(expandedImage)
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -119,7 +113,7 @@ func (cosmicImage *CosmicImage) ComputeGalaxyPaths() map[string]int {
             maxId := int(math.Max(float64(galaxyA.mId), float64(galaxyB.mId)))
             key := fmt.Sprintf("%d,%d", minId, maxId)
             if _, ok := galaxyPaths[key] ; !ok {
-               galaxyPaths[key] = ComputeGalaxyPath(galaxyA, galaxyB)
+               galaxyPaths[key] = cosmicImage.ComputeGalaxyPath(galaxyA, galaxyB)
             }
          }
       }
@@ -166,9 +160,44 @@ func Transpose(pInput []string) []string {
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
-func ComputeGalaxyPath(pGalaxyA Galaxy, pGalaxyB Galaxy) int {
+func (cosmicImage *CosmicImage) ComputeGalaxyPath(pGalaxyA Galaxy, pGalaxyB Galaxy) int {
    rowDiff := int(math.Abs(float64(pGalaxyA.mRow-pGalaxyB.mRow)))
-   colDiff := int(math.Abs(float64(pGalaxyA.mCol-pGalaxyB.mCol)))
+   emptyRows := cosmicImage.emptyRows(pGalaxyA.mRow, pGalaxyB.mRow)
 
-   return rowDiff + colDiff
+   colDiff := int(math.Abs(float64(pGalaxyA.mCol-pGalaxyB.mCol)))
+   emptyCols := cosmicImage.emptyCols(pGalaxyA.mCol, pGalaxyB.mCol)
+
+   return rowDiff + colDiff + (len(emptyRows)*(cosmicImage.mExpansionMultiplier-1)) + (len(emptyCols)*(cosmicImage.mExpansionMultiplier-1))
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func (cosmicImage *CosmicImage) emptyRows(pRowIdxA int, pRowIdxB int) []int {
+   emptyRows := []int{}
+
+   for _, rowIdx := range cosmicImage.mEmptyRows {
+      if (pRowIdxA < rowIdx && rowIdx < pRowIdxB) ||
+         (pRowIdxB < rowIdx && rowIdx < pRowIdxA) {
+         emptyRows = append(emptyRows, rowIdx)
+      }
+   }
+
+   return emptyRows
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func (cosmicImage *CosmicImage) emptyCols(pColIdxA int, pColIdxB int) []int {
+   emptyCols := []int{}
+
+   for _, colIdx := range cosmicImage.mEmptyCols {
+      if (pColIdxA < colIdx && colIdx < pColIdxB) ||
+         (pColIdxB < colIdx && colIdx < pColIdxA) {
+         emptyCols = append(emptyCols, colIdx)
+      }
+   }
+
+   return emptyCols
 }

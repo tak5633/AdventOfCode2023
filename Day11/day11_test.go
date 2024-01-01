@@ -5,45 +5,44 @@ import (
    "testing"
 )
 
-//--------------------------------------------------------------------------------------------------
+// //--------------------------------------------------------------------------------------------------
+// //
+// //--------------------------------------------------------------------------------------------------
+// func Test_CosmicImage_Expand(t *testing.T) {
+//    lines := []string{
+//       "...#......",
+//       ".......#..",
+//       "#.........",
+//       "..........",
+//       "......#...",
+//       ".#........",
+//       ".........#",
+//       "..........",
+//       ".......#..",
+//       "#...#.....",
+//    }
 //
-//--------------------------------------------------------------------------------------------------
-func Test_CosmicImage_Expand(t *testing.T) {
-   lines := []string{
-      "...#......",
-      ".......#..",
-      "#.........",
-      "..........",
-      "......#...",
-      ".#........",
-      ".........#",
-      "..........",
-      ".......#..",
-      "#...#.....",
-   }
-
-   cosmicImage := ci.CosmicImage{}
-   cosmicImage.SetImage(lines)
-
-   expandedImage := []string{
-      "....#........",
-      ".........#...",
-      "#............",
-      ".............",
-      ".............",
-      "........#....",
-      ".#...........",
-      "............#",
-      ".............",
-      ".............",
-      ".........#...",
-      "#....#.......",
-   }
-
-   if len(cosmicImage.Image()) != len(expandedImage) {
-      t.Fatal()
-   }
-}
+//    cosmicImage := ci.NewCosmicImage(lines, 2)
+//
+//    expandedImage := []string{
+//       "....#........",
+//       ".........#...",
+//       "#............",
+//       ".............",
+//       ".............",
+//       "........#....",
+//       ".#...........",
+//       "............#",
+//       ".............",
+//       ".............",
+//       ".........#...",
+//       "#....#.......",
+//    }
+//
+//    if len(cosmicImage.Image()) != len(expandedImage) {
+//       t.Fatal()
+//    }
+// }
 
 //--------------------------------------------------------------------------------------------------
 //
@@ -62,8 +61,7 @@ func Test_CosmicImage_FindGalaxies(t *testing.T) {
       "#...#.....",
    }
 
-   cosmicImage := ci.CosmicImage{}
-   cosmicImage.SetImage(lines)
+   cosmicImage := ci.NewCosmicImage(lines, 2)
 
    if len(cosmicImage.Galaxies()) != 9 {
       t.Fatal()
@@ -87,8 +85,7 @@ func Test_ComputeGalaxyPaths(t *testing.T) {
       "#...#.....",
    }
 
-   cosmicImage := ci.CosmicImage{}
-   cosmicImage.SetImage(lines)
+   cosmicImage := ci.NewCosmicImage(lines, 2)
    galaxyPaths := cosmicImage.ComputeGalaxyPaths()
 
    if len(galaxyPaths) != 36 {
@@ -113,8 +110,7 @@ func Test_SumGalaxyPaths(t *testing.T) {
       "#...#.....",
    }
 
-   cosmicImage := ci.CosmicImage{}
-   cosmicImage.SetImage(lines)
+   cosmicImage := ci.NewCosmicImage(lines, 2)
    galaxyPaths := cosmicImage.ComputeGalaxyPaths()
    sumOfGalaxyPaths := SumGalaxyPaths(galaxyPaths)
 

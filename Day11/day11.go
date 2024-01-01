@@ -12,6 +12,7 @@ import (
 //--------------------------------------------------------------------------------------------------
 func main() {
    Part1()
+   Part2()
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -22,8 +23,22 @@ func Part1() {
 
    inputLines := ReadInput()
 
-   cosmicImage := ci.CosmicImage{}
-   cosmicImage.SetImage(inputLines)
+   cosmicImage := ci.NewCosmicImage(inputLines, 2)
+   galaxyPaths := cosmicImage.ComputeGalaxyPaths()
+   sumOfGalaxyPaths := SumGalaxyPaths(galaxyPaths)
+
+   fmt.Println("Sum of Galaxy Paths:", sumOfGalaxyPaths)
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func Part2() {
+   fmt.Println("Part 2")
+
+   inputLines := ReadInput()
+
+   cosmicImage := ci.NewCosmicImage(inputLines, 1000000)
    galaxyPaths := cosmicImage.ComputeGalaxyPaths()
    sumOfGalaxyPaths := SumGalaxyPaths(galaxyPaths)
 
