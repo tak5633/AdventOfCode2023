@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -296,6 +297,39 @@ func Test_Part2_GetRecordDataNumArrangements(t *testing.T) {
    numArrangements = GetRecordDataNumArrangementsPart2(recordData)
 
    if numArrangements != 506250 {
+      t.Fatal()
+   }
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func Test_Part2_GetNumArrangementsPart2New(t *testing.T) {
+   numContiguousDamagedSprings := []int{1, 1, 1}
+   numOperationalSprings := 5
+
+   numArrangements := GetNumArrangementsPart2New(numContiguousDamagedSprings, numOperationalSprings)
+
+   if numArrangements != 4 {
+      t.Fatal()
+   }
+
+   numContiguousDamagedSprings = []int{1, 1, 1}
+   numOperationalSprings = 7
+
+   numArrangements = GetNumArrangementsPart2New(numContiguousDamagedSprings, numOperationalSprings)
+
+   if numArrangements != 6 {
+      t.Fatal()
+   }
+
+   numContiguousDamagedSprings = []int{1, 1, 1, 1}
+   numOperationalSprings = 6
+
+   numArrangements = GetNumArrangementsPart2New(numContiguousDamagedSprings, numOperationalSprings)
+
+   if numArrangements != 10 {
+      fmt.Println(numArrangements)
       t.Fatal()
    }
 }

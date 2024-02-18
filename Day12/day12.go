@@ -351,3 +351,33 @@ func GetNumTargetArrangements(pTestRecord string, pNumContiguousDamagedSprings [
 
    return numArrangements
 }
+
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func GetNumArrangementsPart2New(pNumContiguousDamagedSprings []int, pNumOperationalSprings int) int {
+
+   if len(pNumContiguousDamagedSprings) == 1 {
+      return pNumOperationalSprings+1
+
+   } else if len(pNumContiguousDamagedSprings) == 2 {
+      return pNumOperationalSprings
+
+   } else if len(pNumContiguousDamagedSprings) == 3 {
+      return pNumOperationalSprings-1
+   }
+
+   numArrangements := 0
+   maxNumContiguousOperationalSprings := pNumOperationalSprings-(len(pNumContiguousDamagedSprings)-2);
+
+   for numContiguousOperationalSprings := 1; numContiguousOperationalSprings <= maxNumContiguousOperationalSprings; numContiguousOperationalSprings++ {
+
+      newNumContiguousDamagedSprings := pNumContiguousDamagedSprings[1:]
+      newNumOperationalSprings := pNumOperationalSprings-numContiguousOperationalSprings
+
+      numArrangements += GetNumArrangementsPart2New(newNumContiguousDamagedSprings, newNumOperationalSprings)
+   }
+
+   return numArrangements
+}
