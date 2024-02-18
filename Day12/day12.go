@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"math"
 	"os"
 	"strconv"
@@ -19,13 +19,14 @@ type RecordData struct {
 //--------------------------------------------------------------------------------------------------
 func main() {
    part1()
+   part2()
 }
 
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
 func part1() {
-   fmt.Println("Part 1")
+   log.Println("Part 1")
 
    inputLines := ReadInput()
 
@@ -37,7 +38,28 @@ func part1() {
       sumOfAllArrangements += GetRecordDataNumArrangements(recordData)
    }
 
-   fmt.Println("Sum of All Arrangements:", sumOfAllArrangements)
+   log.Println("Sum of All Arrangements:", sumOfAllArrangements)
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func part2() {
+   log.Println("Part 2")
+
+   inputLines := ReadInput()
+
+   part2InputLines := Part2InputFormatter(inputLines)
+   allRecordData := ParseAllRecordData(part2InputLines)
+
+   sumOfAllArrangements := 0
+
+   for recordDataIdx, recordData := range allRecordData {
+      log.Println("RecordDataIdx:", recordDataIdx)
+      sumOfAllArrangements += GetRecordDataNumArrangementsPart2(recordData)
+   }
+
+   log.Println("Sum of All Arrangements:", sumOfAllArrangements)
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -100,6 +122,32 @@ func ParseRecordData(pInput string) (RecordData, error) {
    }
 
    return recordData, nil
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func Part2InputFormatter(pInputs []string) []string {
+   formattedInputs := []string{}
+
+   for _, input := range pInputs {
+      fields := strings.Fields(input)
+
+      if len(fields) == 2 {
+         record := fields[0] + "?"
+         newRecord := strings.Repeat(record, 5)
+         newRecord = newRecord[:len(newRecord)-1]
+
+         numContiguousDamagedSpringsListing := fields[1] + ","
+         newNumContiguousDamagedSpringsListing := strings.Repeat(numContiguousDamagedSpringsListing, 5)
+         newNumContiguousDamagedSpringsListing = newNumContiguousDamagedSpringsListing[:len(newNumContiguousDamagedSpringsListing)-1]
+
+         formattedInput := newRecord + " " + newNumContiguousDamagedSpringsListing
+         formattedInputs = append(formattedInputs, formattedInput)
+      }
+   }
+
+   return formattedInputs
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -186,6 +234,119 @@ func GetNumArrangements(pOriginalRecord string, pNumContiguousDamagedSprings []i
 
       numContiguousOperationalSprings[i] = numContiguousOperationalSprings[i]+1
       numArrangements += GetNumArrangements(pOriginalRecord, pNumContiguousDamagedSprings, pNumOperationalSpringsToDistribute-1, numContiguousOperationalSprings, pMatchingRecords)
+   }
+
+   return numArrangements
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func GetRecordDataNumArrangementsPart2(pRecordData RecordData) int {
+   return GetNumArrangementsPart2(pRecordData.mRecord, pRecordData.mNumContiguousDamagedSprings)
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func GetNumArrangementsPart2(pTestRecord string, pNumContiguousDamagedSprings []int) int {
+
+   testRecord := pTestRecord
+   unknownSpringIdx := strings.Index(testRecord, "?")
+
+   numTestContiguousDamagedSprings := 0
+   testContiguousDamagedSpringsIdx := 0
+
+   if unknownSpringIdx == -1 {
+
+      for testRecordRuneIdx := 0; testRecordRuneIdx < len(pTestRecord); testRecordRuneIdx++ {
+         testRecordRune := pTestRecord[testRecordRuneIdx]
+
+         if testRecordRune == '#' {
+            numTestContiguousDamagedSprings++
+
+         } else if testRecordRune == '.' {
+
+            if numTestContiguousDamagedSprings > 0 {
+               if testContiguousDamagedSpringsIdx >= len(pNumContiguousDamagedSprings) ||
+                  numTestContiguousDamagedSprings != pNumContiguousDamagedSprings[testContiguousDamagedSpringsIdx] {
+                  return 0
+               }
+               testContiguousDamagedSpringsIdx++
+            }
+            numTestContiguousDamagedSprings = 0
+         }
+
+         if testRecordRuneIdx == (len(pTestRecord)-1) {
+            if numTestContiguousDamagedSprings > 0 {
+               if testContiguousDamagedSpringsIdx < len(pNumContiguousDamagedSprings) &&
+                  numTestContiguousDamagedSprings != pNumContiguousDamagedSprings[testContiguousDamagedSpringsIdx] {
+                  return 0
+               }
+               testContiguousDamagedSpringsIdx++
+            }
+            numTestContiguousDamagedSprings = 0
+
+            if testContiguousDamagedSpringsIdx != len(pNumContiguousDamagedSprings) {
+               return 0
+            }
+         }
+      }
+
+      return 1
+   }
+
+   numArrangements := GetNumTargetArrangements(testRecord, pNumContiguousDamagedSprings, '.')
+   numArrangements += GetNumTargetArrangements(testRecord, pNumContiguousDamagedSprings, '#')
+
+   return numArrangements
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func GetNumTargetArrangements(pTestRecord string, pNumContiguousDamagedSprings []int, pTargetRune rune) int {
+
+   numArrangements := 0
+
+   targetRecord := strings.Replace(pTestRecord, "?", string(pTargetRune), 1)
+   numTestContiguousDamagedSprings := 0
+   testContiguousDamagedSpringsIdx := 0
+
+   for targetRecordRuneIdx := 0; targetRecordRuneIdx < len(targetRecord); targetRecordRuneIdx++ {
+      targetRecordRune := targetRecord[targetRecordRuneIdx]
+
+      if targetRecordRune == '#' {
+         numTestContiguousDamagedSprings++
+
+      } else if targetRecordRune == '.' {
+
+         if numTestContiguousDamagedSprings > 0 {
+            if testContiguousDamagedSpringsIdx >= len(pNumContiguousDamagedSprings) ||
+               numTestContiguousDamagedSprings != pNumContiguousDamagedSprings[testContiguousDamagedSpringsIdx] {
+               break
+            }
+
+            testContiguousDamagedSpringsIdx++
+         }
+         numTestContiguousDamagedSprings = 0
+
+      } else if targetRecordRune == '?' {
+
+         if numTestContiguousDamagedSprings > 0 {
+            if testContiguousDamagedSpringsIdx >= len(pNumContiguousDamagedSprings) ||
+               numTestContiguousDamagedSprings > pNumContiguousDamagedSprings[testContiguousDamagedSpringsIdx] {
+               break
+            }
+         }
+
+         numArrangements += GetNumArrangementsPart2(targetRecord, pNumContiguousDamagedSprings)
+         break
+      }
+
+      if targetRecordRuneIdx == (len(targetRecord)-1) {
+         numArrangements += GetNumArrangementsPart2(targetRecord, pNumContiguousDamagedSprings)
+      }
    }
 
    return numArrangements
