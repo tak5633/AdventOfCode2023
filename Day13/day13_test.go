@@ -101,6 +101,56 @@ func Test_GetSummaryValue(t *testing.T) {
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
+func Test_FindRowReflectionIndex2_1(t *testing.T) {
+
+   var pattern []string
+
+	pattern = append(pattern, "#.##..##.")
+	pattern = append(pattern, "..#.##.#.")
+	pattern = append(pattern, "##......#")
+	pattern = append(pattern, "##......#")
+	pattern = append(pattern, "..#.##.#.")
+	pattern = append(pattern, "..##..##.")
+	pattern = append(pattern, "#.#.##.#.")
+
+   reflectionIndex, _ := FindRowReflectionIndex2(pattern)
+   expected := 2
+
+   if reflectionIndex != expected {
+      log.Println(reflectionIndex)
+      log.Println(expected)
+      t.Fatal()
+   }
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func Test_FindRowReflectionIndex2_2(t *testing.T) {
+
+   var pattern []string
+
+   pattern = append(pattern, "#...##..#")
+   pattern = append(pattern, "#....#..#")
+   pattern = append(pattern, "..##..###")
+   pattern = append(pattern, "#####.##.")
+   pattern = append(pattern, "#####.##.")
+   pattern = append(pattern, "..##..###")
+   pattern = append(pattern, "#....#..#")
+
+   reflectionIndex, _ := FindRowReflectionIndex2(pattern)
+   expected := 0
+
+   if reflectionIndex != expected {
+      log.Println(reflectionIndex)
+      log.Println(expected)
+      t.Fatal()
+   }
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
 func Test_Transpose(t *testing.T) {
 
    var pattern []string
