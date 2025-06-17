@@ -25,10 +25,12 @@ func part1() {
 
 	log.Println("Num Patterns:", len(patterns))
 
-	patternSummaryValue := GetSummaryValue(patterns)
+	requiredNumSmudges := 0
+	patternSummaryValue := GetSummaryValue(patterns, requiredNumSmudges)
 	log.Println("Pattern Summary Value:", patternSummaryValue)
 
-	patternSummaryValue2 := GetSummaryValue2(patterns)
+	requiredNumSmudges2 := 1
+	patternSummaryValue2 := GetSummaryValue(patterns, requiredNumSmudges2)
 	log.Println("Pattern Summary Value 2:", patternSummaryValue2)
 }
 
@@ -81,14 +83,14 @@ func ParsePatterns(pInputs []string) [][]string {
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
-func GetSummaryValue(pPatterns [][]string) int {
+func GetSummaryValue(pPatterns [][]string, pRequiredNumSmudges int) int {
 
 	patternSummaryValue := 0
 
 	for i, pattern := range pPatterns {
 		log.Println("i:", i)
-		rowReflectionIndex, rowReflectionWidth := FindRowReflectionIndex(pattern)
-		colReflectionIndex, colReflectionWidth := FindColReflectionIndex(pattern)
+		rowReflectionIndex, rowReflectionWidth := FindRowReflectionIndex(pattern, pRequiredNumSmudges)
+		colReflectionIndex, colReflectionWidth := FindColReflectionIndex(pattern, pRequiredNumSmudges)
 
 		if rowReflectionIndex != -1 {
 			log.Println("Row:", rowReflectionIndex, "Width:", rowReflectionWidth)
@@ -109,17 +111,17 @@ func GetSummaryValue(pPatterns [][]string) int {
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
-func FindColReflectionIndex(pPattern []string) (int, int) {
+func FindColReflectionIndex(pPattern []string, pRequiredNumSmudges int) (int, int) {
 
 	transposedPattern := Transpose(pPattern)
 
-	return FindRowReflectionIndex(transposedPattern)
+	return FindRowReflectionIndex(transposedPattern, pRequiredNumSmudges)
 }
 
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
-func FindRowReflectionIndex(pPattern []string) (int, int) {
+func FindRowReflectionIndex(pPattern []string, pRequiredNumSmudges int) (int, int) {
 
 	reflectionIndex := -1
 	reflectionWidth := -1
@@ -130,7 +132,10 @@ func FindRowReflectionIndex(pPattern []string) (int, int) {
 		lowerReflectionWidth := len(pPattern) - row - 1
 		testReflectionWidth := int(math.Min(float64(upperReflectionWidth), float64(lowerReflectionWidth)))
 
-		rowReflectionIndex, rowReflectionWidth := FindRowReflectionIndexConstrained(pPattern, row, 0, testReflectionWidth)
+		col := 0
+		numSmudges := 0
+
+		rowReflectionIndex, rowReflectionWidth := FindRowReflectionIndexConstrained(pPattern, row, col, testReflectionWidth, numSmudges, pRequiredNumSmudges)
 
 		if rowReflectionWidth != -1 && rowReflectionWidth >= reflectionWidth {
 			reflectionIndex = rowReflectionIndex
@@ -144,107 +149,16 @@ func FindRowReflectionIndex(pPattern []string) (int, int) {
 //--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
-func FindRowReflectionIndexConstrained(pPattern []string, pRow int, pCol int, pReflectionWidth int) (int, int) {
+func FindRowReflectionIndexConstrained(pPattern []string, pRow int, pCol int, pReflectionWidth int, pNumSmudges int, pRequiredNumSmudges int) (int, int) {
 
-	if pReflectionWidth == 0 {
+	if pReflectionWidth == 0 || pNumSmudges > pRequiredNumSmudges {
 		return -1, -1
 	}
 
 	numCols := len(pPattern[0])
 
 	if pCol >= numCols {
-		return pRow, pReflectionWidth
-	}
-
-	for rowOffset := range pReflectionWidth {
-
-		upperRow := pRow - rowOffset
-		lowerRow := (pRow + 1) + rowOffset
-
-		if pPattern[upperRow][pCol] != pPattern[lowerRow][pCol] {
-			return -1, -1
-		}
-	}
-
-	return FindRowReflectionIndexConstrained(pPattern, pRow, pCol+1, pReflectionWidth)
-}
-
-//--------------------------------------------------------------------------------------------------
-//
-//--------------------------------------------------------------------------------------------------
-func GetSummaryValue2(pPatterns [][]string) int {
-
-	patternSummaryValue := 0
-
-	for i, pattern := range pPatterns {
-		log.Println("i:", i)
-		rowReflectionIndex, rowReflectionWidth := FindRowReflectionIndex2(pattern)
-		colReflectionIndex, colReflectionWidth := FindColReflectionIndex2(pattern)
-
-		if rowReflectionIndex != -1 {
-			log.Println("Row:", rowReflectionIndex, "Width:", rowReflectionWidth)
-			patternSummaryValue += (100 * (rowReflectionIndex + 1))
-		}
-
-		if colReflectionIndex != -1 {
-			log.Println("Col:", colReflectionIndex, "Width:", colReflectionWidth)
-			patternSummaryValue += (colReflectionIndex + 1)
-		}
-
-		log.Println("Current Pattern Summary Value:", patternSummaryValue)
-	}
-
-	return patternSummaryValue
-}
-
-//--------------------------------------------------------------------------------------------------
-//
-//--------------------------------------------------------------------------------------------------
-func FindColReflectionIndex2(pPattern []string) (int, int) {
-
-	transposedPattern := Transpose(pPattern)
-
-	return FindRowReflectionIndex2(transposedPattern)
-}
-
-//--------------------------------------------------------------------------------------------------
-//
-//--------------------------------------------------------------------------------------------------
-func FindRowReflectionIndex2(pPattern []string) (int, int) {
-
-	reflectionIndex := -1
-	reflectionWidth := -1
-
-	for row := range pPattern {
-
-		upperReflectionWidth := row + 1
-		lowerReflectionWidth := len(pPattern) - row - 1
-		testReflectionWidth := int(math.Min(float64(upperReflectionWidth), float64(lowerReflectionWidth)))
-
-		rowReflectionIndex, rowReflectionWidth := FindRowReflectionIndexConstrained2(pPattern, row, 0, testReflectionWidth, 0)
-
-		if rowReflectionWidth != -1 && rowReflectionWidth >= reflectionWidth {
-			reflectionIndex = rowReflectionIndex
-			reflectionWidth = rowReflectionWidth
-		}
-	}
-
-	return reflectionIndex, reflectionWidth
-}
-
-//--------------------------------------------------------------------------------------------------
-//
-//--------------------------------------------------------------------------------------------------
-func FindRowReflectionIndexConstrained2(pPattern []string, pRow int, pCol int, pReflectionWidth int, pNumSmudges int) (int, int) {
-
-	if pReflectionWidth == 0 || pNumSmudges > 1 {
-		return -1, -1
-	}
-
-	numCols := len(pPattern[0])
-
-	if pCol >= numCols {
-		if pNumSmudges != 1 {
+		if pNumSmudges != pRequiredNumSmudges {
 			return -1, -1
 		}
 
@@ -262,12 +176,12 @@ func FindRowReflectionIndexConstrained2(pPattern []string, pRow int, pCol int, p
 			numSmudges += 1
 		}
 
-		if numSmudges > 1 {
+		if numSmudges > pRequiredNumSmudges {
 			return -1, -1
 		}
 	}
 
-	return FindRowReflectionIndexConstrained2(pPattern, pRow, pCol+1, pReflectionWidth, numSmudges)
+	return FindRowReflectionIndexConstrained(pPattern, pRow, pCol+1, pReflectionWidth, numSmudges, pRequiredNumSmudges)
 }
 
 //--------------------------------------------------------------------------------------------------

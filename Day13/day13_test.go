@@ -20,7 +20,8 @@ func Test_FindColReflectionIndex(t *testing.T) {
 	pattern = append(pattern, "..##..##.")
 	pattern = append(pattern, "#.#.##.#.")
 
-   reflectionIndex, _ := FindColReflectionIndex(pattern)
+	requiredNumSmudges := 0
+   reflectionIndex, _ := FindColReflectionIndex(pattern, requiredNumSmudges)
    expected := 4
 
    if reflectionIndex != expected {
@@ -45,7 +46,8 @@ func Test_FindRowReflectionIndex(t *testing.T) {
    pattern = append(pattern, "..##..###")
    pattern = append(pattern, "#....#..#")
 
-   reflectionIndex, _ := FindRowReflectionIndex(pattern)
+	requiredNumSmudges := 0
+   reflectionIndex, _ := FindRowReflectionIndex(pattern, requiredNumSmudges)
    expected := 3
 
    if reflectionIndex != expected {
@@ -90,7 +92,8 @@ func Test_GetSummaryValue(t *testing.T) {
 		patterns = append(patterns, pattern)
 	}
 
-	patternSummaryValue := GetSummaryValue(patterns)
+	requiredNumSmudges := 0
+	patternSummaryValue := GetSummaryValue(patterns, requiredNumSmudges)
 
 	if patternSummaryValue != 405 {
       log.Println(patternSummaryValue)
@@ -113,7 +116,8 @@ func Test_FindRowReflectionIndex2_1(t *testing.T) {
 	pattern = append(pattern, "..##..##.")
 	pattern = append(pattern, "#.#.##.#.")
 
-   reflectionIndex, _ := FindRowReflectionIndex2(pattern)
+	requiredNumSmudges := 1
+   reflectionIndex, _ := FindRowReflectionIndex(pattern, requiredNumSmudges)
    expected := 2
 
    if reflectionIndex != expected {
@@ -138,7 +142,8 @@ func Test_FindRowReflectionIndex2_2(t *testing.T) {
    pattern = append(pattern, "..##..###")
    pattern = append(pattern, "#....#..#")
 
-   reflectionIndex, _ := FindRowReflectionIndex2(pattern)
+	requiredNumSmudges := 1
+   reflectionIndex, _ := FindRowReflectionIndex(pattern, requiredNumSmudges)
    expected := 0
 
    if reflectionIndex != expected {
@@ -146,6 +151,50 @@ func Test_FindRowReflectionIndex2_2(t *testing.T) {
       log.Println(expected)
       t.Fatal()
    }
+}
+
+//--------------------------------------------------------------------------------------------------
+//
+//--------------------------------------------------------------------------------------------------
+func Test_GetSummaryValue2(t *testing.T) {
+
+	var patterns [][]string
+
+	{
+		var pattern []string
+
+		pattern = append(pattern, "#.##..##.")
+		pattern = append(pattern, "..#.##.#.")
+		pattern = append(pattern, "##......#")
+		pattern = append(pattern, "##......#")
+		pattern = append(pattern, "..#.##.#.")
+		pattern = append(pattern, "..##..##.")
+		pattern = append(pattern, "#.#.##.#.")
+
+		patterns = append(patterns, pattern)
+	}
+
+	{
+		var pattern []string
+
+		pattern = append(pattern, "#...##..#")
+		pattern = append(pattern, "#....#..#")
+		pattern = append(pattern, "..##..###")
+		pattern = append(pattern, "#####.##.")
+		pattern = append(pattern, "#####.##.")
+		pattern = append(pattern, "..##..###")
+		pattern = append(pattern, "#....#..#")
+
+		patterns = append(patterns, pattern)
+	}
+
+	requiredNumSmudges := 1
+	patternSummaryValue := GetSummaryValue(patterns, requiredNumSmudges)
+
+	if patternSummaryValue != 400 {
+      log.Println(patternSummaryValue)
+	   t.Fatal()
+	}
 }
 
 //--------------------------------------------------------------------------------------------------
