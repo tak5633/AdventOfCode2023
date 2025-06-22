@@ -372,49 +372,49 @@ func Test_ParseStep(t *testing.T) {
 //
 //--------------------------------------------------------------------------------------------------
 func Test_AddLense(t *testing.T) {
-	box := Box{}
+   box := Box{}
 
-	{
-		label := "ot"
-		focalLength := 9
-		box.AddLense(label, focalLength)
+   {
+      label := "ot"
+      focalLength := 9
+      box.AddLense(label, focalLength)
 
       if len(box.mLenseInfoList) != 1 ||
-		   box.mLenseInfoList[0].mLabel != label ||
-		   box.mLenseInfoList[0].mFocalLength != focalLength {
+         box.mLenseInfoList[0].mLabel != label ||
+         box.mLenseInfoList[0].mFocalLength != focalLength {
 
-			log.Println(box.mLenseInfoList[0])
+         log.Println(box.mLenseInfoList[0])
          t.Fatal()
       }
-	}
+   }
 
-	{
-		label := "ab"
-		focalLength := 5
-		box.AddLense(label, focalLength)
+   {
+      label := "ab"
+      focalLength := 5
+      box.AddLense(label, focalLength)
 
       if len(box.mLenseInfoList) != 2 ||
-		   box.mLenseInfoList[1].mLabel != label ||
-		   box.mLenseInfoList[1].mFocalLength != focalLength {
+         box.mLenseInfoList[1].mLabel != label ||
+         box.mLenseInfoList[1].mFocalLength != focalLength {
 
-			log.Println(box.mLenseInfoList[0])
+         log.Println(box.mLenseInfoList[0])
          t.Fatal()
       }
-	}
+   }
 
-	{
-		label := "ot"
-		focalLength := 7
-		box.AddLense(label, focalLength)
+   {
+      label := "ot"
+      focalLength := 7
+      box.AddLense(label, focalLength)
 
       if len(box.mLenseInfoList) != 2 ||
-		   box.mLenseInfoList[0].mLabel != label ||
-		   box.mLenseInfoList[0].mFocalLength != focalLength {
+         box.mLenseInfoList[0].mLabel != label ||
+         box.mLenseInfoList[0].mFocalLength != focalLength {
 
-			log.Println(box.mLenseInfoList[0])
+         log.Println(box.mLenseInfoList[0])
          t.Fatal()
       }
-	}
+   }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -422,92 +422,92 @@ func Test_AddLense(t *testing.T) {
 //--------------------------------------------------------------------------------------------------
 func Test_RemoveLense(t *testing.T) {
 
-	{
-		// Beginning
-		box := Box{}
+   {
+      // Beginning
+      box := Box{}
 
-		box.AddLense("qp", 0)
+      box.AddLense("qp", 0)
 
-		if len(box.mLenseInfoList) != 1 ||
-		   box.mLenseInfoList[0].mLabel != "qp" {
-			t.Fatal()
-		}
+      if len(box.mLenseInfoList) != 1 ||
+         box.mLenseInfoList[0].mLabel != "qp" {
+         t.Fatal()
+      }
 
-		box.RemoveLense("nomatch")
+      box.RemoveLense("nomatch")
 
-		if len(box.mLenseInfoList) != 1 ||
-		   box.mLenseInfoList[0].mLabel != "qp" {
-			t.Fatal()
-		}
+      if len(box.mLenseInfoList) != 1 ||
+         box.mLenseInfoList[0].mLabel != "qp" {
+         t.Fatal()
+      }
 
-		box.RemoveLense("qp")
+      box.RemoveLense("qp")
 
-		if len(box.mLenseInfoList) != 0 {
-			t.Fatal()
-		}
-	}
+      if len(box.mLenseInfoList) != 0 {
+         t.Fatal()
+      }
+   }
 
-	{
-		// Middle
-		box := Box{}
+   {
+      // Middle
+      box := Box{}
 
-		box.AddLense("kt", 0)
-		box.AddLense("qp", 0)
-		box.AddLense("ck", 0)
+      box.AddLense("kt", 0)
+      box.AddLense("qp", 0)
+      box.AddLense("ck", 0)
 
-		if len(box.mLenseInfoList) != 3 ||
-		   box.mLenseInfoList[0].mLabel != "kt" ||
-		   box.mLenseInfoList[1].mLabel != "qp" ||
-		   box.mLenseInfoList[2].mLabel != "ck" {
-			t.Fatal()
-		}
+      if len(box.mLenseInfoList) != 3 ||
+         box.mLenseInfoList[0].mLabel != "kt" ||
+         box.mLenseInfoList[1].mLabel != "qp" ||
+         box.mLenseInfoList[2].mLabel != "ck" {
+         t.Fatal()
+      }
 
-		box.RemoveLense("nomatch")
+      box.RemoveLense("nomatch")
 
-		if len(box.mLenseInfoList) != 3 ||
-		   box.mLenseInfoList[0].mLabel != "kt" ||
-		   box.mLenseInfoList[1].mLabel != "qp" ||
-		   box.mLenseInfoList[2].mLabel != "ck" {
-			t.Fatal()
-		}
+      if len(box.mLenseInfoList) != 3 ||
+         box.mLenseInfoList[0].mLabel != "kt" ||
+         box.mLenseInfoList[1].mLabel != "qp" ||
+         box.mLenseInfoList[2].mLabel != "ck" {
+         t.Fatal()
+      }
 
-		box.RemoveLense("qp")
+      box.RemoveLense("qp")
 
-		if len(box.mLenseInfoList) != 2 ||
-		   box.mLenseInfoList[0].mLabel != "kt" ||
-		   box.mLenseInfoList[1].mLabel != "ck" {
-			t.Fatal()
-		}
-	}
+      if len(box.mLenseInfoList) != 2 ||
+         box.mLenseInfoList[0].mLabel != "kt" ||
+         box.mLenseInfoList[1].mLabel != "ck" {
+         t.Fatal()
+      }
+   }
 
-	{
-		// End
-		box := Box{}
+   {
+      // End
+      box := Box{}
 
-		box.AddLense("kt", 0)
-		box.AddLense("qp", 0)
+      box.AddLense("kt", 0)
+      box.AddLense("qp", 0)
 
-		if len(box.mLenseInfoList) != 2 ||
-		   box.mLenseInfoList[0].mLabel != "kt" ||
-		   box.mLenseInfoList[1].mLabel != "qp" {
-			t.Fatal()
-		}
+      if len(box.mLenseInfoList) != 2 ||
+         box.mLenseInfoList[0].mLabel != "kt" ||
+         box.mLenseInfoList[1].mLabel != "qp" {
+         t.Fatal()
+      }
 
-		box.RemoveLense("nomatch")
+      box.RemoveLense("nomatch")
 
-		if len(box.mLenseInfoList) != 2 ||
-		   box.mLenseInfoList[0].mLabel != "kt" ||
-		   box.mLenseInfoList[1].mLabel != "qp" {
-			t.Fatal()
-		}
+      if len(box.mLenseInfoList) != 2 ||
+         box.mLenseInfoList[0].mLabel != "kt" ||
+         box.mLenseInfoList[1].mLabel != "qp" {
+         t.Fatal()
+      }
 
-		box.RemoveLense("qp")
+      box.RemoveLense("qp")
 
-		if len(box.mLenseInfoList) != 1 ||
-		   box.mLenseInfoList[0].mLabel != "kt" {
-			t.Fatal()
-		}
-	}
+      if len(box.mLenseInfoList) != 1 ||
+         box.mLenseInfoList[0].mLabel != "kt" {
+         t.Fatal()
+      }
+   }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -515,61 +515,61 @@ func Test_RemoveLense(t *testing.T) {
 //--------------------------------------------------------------------------------------------------
 func Test_CalculateFocusingPower(t *testing.T) {
 
-	{
-		box := Box{}
-		box.mIndex = 0
+   {
+      box := Box{}
+      box.mIndex = 0
 
-		{
-			var lenseInfo LenseInfo
-			lenseInfo.mFocalLength = 1
-			box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
-		}
+      {
+         var lenseInfo LenseInfo
+         lenseInfo.mFocalLength = 1
+         box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
+      }
 
-		{
-			var lenseInfo LenseInfo
-			lenseInfo.mFocalLength = 2
-			box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
-		}
+      {
+         var lenseInfo LenseInfo
+         lenseInfo.mFocalLength = 2
+         box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
+      }
 
-		focusingPower := box.CalculateFocusingPower()
-		expected := 5
+      focusingPower := box.CalculateFocusingPower()
+      expected := 5
 
-		if focusingPower != expected {
-			log.Println(focusingPower)
-			log.Println(expected)
-			t.Fatal()
-		}
-	}
+      if focusingPower != expected {
+         log.Println(focusingPower)
+         log.Println(expected)
+         t.Fatal()
+      }
+   }
 
-	{
-		box := Box{}
-		box.mIndex = 3
+   {
+      box := Box{}
+      box.mIndex = 3
 
-		{
-			var lenseInfo LenseInfo
-			lenseInfo.mFocalLength = 7
-			box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
-		}
+      {
+         var lenseInfo LenseInfo
+         lenseInfo.mFocalLength = 7
+         box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
+      }
 
-		{
-			var lenseInfo LenseInfo
-			lenseInfo.mFocalLength = 5
-			box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
-		}
+      {
+         var lenseInfo LenseInfo
+         lenseInfo.mFocalLength = 5
+         box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
+      }
 
-		{
-			var lenseInfo LenseInfo
-			lenseInfo.mFocalLength = 6
-			box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
-		}
+      {
+         var lenseInfo LenseInfo
+         lenseInfo.mFocalLength = 6
+         box.mLenseInfoList = append(box.mLenseInfoList, lenseInfo)
+      }
 
-		focusingPower := box.CalculateFocusingPower()
-		expected := 140
+      focusingPower := box.CalculateFocusingPower()
+      expected := 140
 
-		if focusingPower != expected {
-			log.Println(focusingPower)
-			log.Println(expected)
-			t.Fatal()
-		}
-	}
+      if focusingPower != expected {
+         log.Println(focusingPower)
+         log.Println(expected)
+         t.Fatal()
+      }
+   }
 }
